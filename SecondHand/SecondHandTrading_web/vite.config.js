@@ -22,7 +22,7 @@ export default defineConfig({
     allowedHosts: true, // 允许所有域名访问（穿透必备）
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'https://karry-production-846c.up.railway.app:8080',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       }
