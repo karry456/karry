@@ -1,24 +1,69 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
 spring:
+  application:
+    name: rural-ecommerce
+  
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    # 完全匹配 Railway 内网连接参数，修正端口、SSL、时区
-    url: jdbc:mysql://${MYSQLHOST}:${MYSQLPORT}/${MYSQL_DATABASE}?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&verifyServerCertificate=false
+    url: jdbc:mysql://${MYSQLHOST}:${MYSQLPORT}/railway?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: ${MYSQLUSER}
     password: ${MYSQLPASSWORD}
-    # 补充连接池，避免 Railway 网络超时断开
+    driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
-      connection-timeout: 30000
-      idle-timeout: 600000
-      max-lifetime: 1800000
-      maximum-pool-size: 10
+      minimum-idle: 5
+      maximum-pool-size: 20
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      connection-timeout: 20000
+  
+  redis:
+    host: ${REDISHOST}
+    port: ${REDISPORT}
+    password: ${REDISPASSWORD}
+    database: 0
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+  
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
+  
+  web:
+    resources:
+      static-locations: classpath:/static/,file:./uploads/
 
-# 开启驼峰命名（保留原配置）
 mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
+  type-aliases-package: com.rural.ecommerce.entity
   configuration:
     map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
 
-# 修正文件上传路径（Railway 是 Linux 环境，Windows 路径无效）
+# 文件上传配置
 file:
   upload:
-    path: /app/upload/images/
-    access-path: /images/**
+    path: uploads/
+    url: /uploads/
+
+jwt:
+  secret: rural-ecommerce-secret-key-2024
+  expiration: 86400000
+
+logging:
+  level:
+    com.rural.ecommerce: debug
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n"
