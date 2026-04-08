@@ -1,16 +1,24 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${MYSQLHOST}:${MYSQLPORT}/railway?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    # 完全匹配 Railway 内网连接参数，修正端口、SSL、时区
+    url: jdbc:mysql://${MYSQLHOST}:${MYSQLPORT}/${MYSQL_DATABASE}?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&verifyServerCertificate=false
     username: ${MYSQLUSER}
     password: ${MYSQLPASSWORD}
+    # 补充连接池，避免 Railway 网络超时断开
+    hikari:
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      maximum-pool-size: 10
 
-#开启驼峰命名
+# 开启驼峰命名（保留原配置）
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
 
+# 修正文件上传路径（Railway 是 Linux 环境，Windows 路径无效）
 file:
   upload:
-    path: D:/upload/images/  # 本地基础存储路径
-    access-path: /images/**  # 前端访问路径映射
+    path: /app/upload/images/
+    access-path: /images/**
