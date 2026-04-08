@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springboard.mapper.ProductMapper">
+
+    <!-- Product 实体的基础映射（含关联 User） -->
+    <resultMap id="productResultMap" type="com.example.springboard.pojo.Product">
+        <!-- 商品主键 -->
+        <id column="productId" property="productId"/>
+        <!-- 商品基础字段 -->
+        <result column="productNo" property="productNo"/>
+        <result column="userId" property="userId"/>
+        <result column="productName" property="productName"/>
+        <result column="productPhoto" property="productPhoto"/>
+        <result column="productType" property="productType"/>
+        <result column="productPrice" property="productPrice" />
+        <result column="productState" property="productState"/>
+        <result column="favorites" property="favorites"/>
+        <result column="productInfo" property="productInfo"/>
+        <result column="purchased" property="purchased"/>
+        <result column="createTime" property="createTime"/>
+        <result column="updateTime" property="updateTime"/>
+
+        <!-- 嵌套关联 User 实体（通过 userId 关联用户表） -->
+        <association property="user" javaType="com.example.springboard.pojo.User" resultMap="userResultMap"/>
+    </resultMap>
+
+    <!-- 复用你已有的 User 映射（无需修改） -->
+    <resultMap id="userResultMap" type="com.example.springboard.pojo.User">
+        <id column="userId" property="userId"/>
+        <result column="userCode" property="userCode"/>
+        <result column="avatar" property="avatar"/>
+        <result column="userName" property="userName"/>
+        <result column="passWord" property="passWord"/>
+        <result column="onlineUsername" property="onlineUsername"/>
+        <result column="email" property="email"/>
+        <result column="telephoneNumber" property="telephoneNumber"/>
+        <result column="status" property="status"/>
+        <result column="role" property="role"/>
+        <result column="balance" property="balance" />
+        <result column="createTime" property="createTime"/>
+        <result column="updateTime" property="updateTime"/>
+    </resultMap>
+
+
+    <select id="list" resultMap="productResultMap">
+        SELECT * FROM product p
+                 LEFT JOIN user u ON p.userId = u.userId where p.productState=1-- 通过userId关联用户表
+    </select>
+
+<!--    // 修改商品-->
+    <update id="update" parameterType="com.example.springboard.pojo.Product">
+        update product
+        set productName=#{productName},
+        productPhoto=#{productPhoto},
+        productType=#{productType},
+        productPrice=#{productPrice},
+        productState=#{productState},
+        productInfo=#{productInfo},
+        purchased=#{purchased},
+        updateTime=NOW()
+        where productId=#{productId}
+
+    </update>
+
+<!--    分页查询-->
+    <select id="PageList" resultMap="productResultMap">
+        select * from product p
+        LEFT JOIN user u ON p.userId = u.userId
+            <where>
+                <if test="productType != null">
+                    productType=#{productType}
+                </if>
+                <if test="productName != null">
+                and productName like '%${productName}%'
+                </if>
+            </where>
+    </select>
+</mapper>

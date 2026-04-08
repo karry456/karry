@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springboard.mapper.UserMapper">
+
+
+<!--    注册-->
+    <insert id="register" parameterType="com.example.springboard.pojo.User">
+        insert into user(userCode,userName, passWord,role,onlineUsername,createTime,updateTime) values
+               (#{userCode},#{userName}, #{passWord},#{role},#{onlineUsername},NOW(),NOW())
+    </insert>
+<!--    分页查询-->
+    <select id="UserPageList" resultType="com.example.springboard.pojo.User">
+        SELECT * from user
+        <where>
+--            //限制角色权限
+               role > #{bearRole}
+            <if test="role != null and role != ''">
+                AND role = #{role}
+            </if>
+            <if test="userName != null and userName != ''">
+                AND userName LIKE CONCAT('%', #{userName}, '%')
+            </if>
+        </where>
+    </select>
+
+<!--    管理员创建用户-->
+    <insert id="addUser" parameterType="com.example.springboard.pojo.User">
+        insert into user(userCode,avatar,userName, passWord,role,onlineUsername,email,telephoneNumber,status,balance,createTime,updateTime) values
+               (#{userCode},#{avatar},#{userName}, #{passWord},#{role},#{onlineUsername},#{email},#{telephoneNumber},#{status},#{balance},NOW(),NOW())
+    </insert>
+</mapper>

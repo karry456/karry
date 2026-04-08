@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springboard.mapper.OrderMapper">
+    <!-- 订单ResultMap（核心：显式指定所有关联字段的别名映射） -->
+    <resultMap id="OrderWithProductResultMap" type="com.example.springboard.pojo.Order">
+        <!-- 订单字段：column=SQL别名，property=实体字段（和数据库一致） -->
+        <id column="orderId" property="orderId" jdbcType="INTEGER"/>
+        <result column="orderNO" property="orderNO" jdbcType="VARCHAR"/>
+        <result column="userId" property="userId" jdbcType="INTEGER"/>
+        <result column="productId" property="productId" jdbcType="INTEGER"/>
+        <result column="paymentAmount" property="paymentAmount" jdbcType="DOUBLE"/>
+        <result column="status" property="status" jdbcType="VARCHAR"/>
+        <result column="payStatus" property="payStatus" jdbcType="VARCHAR"/>
+        <result column="receiverName" property="receiverName" jdbcType="VARCHAR"/>
+        <result column="receiverPhone" property="receiverPhone" jdbcType="VARCHAR"/>
+        <result column="receiverAddress" property="receiverAddress" jdbcType="VARCHAR"/>
+        <result column="createTime" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="deletedAt" property="deletedAt" jdbcType="BOOLEAN"/>
+
+        <!-- 关联商品：显式映射商品字段（SQL别名→实体字段） -->
+        <association property="product" javaType="com.example.springboard.pojo.Product">
+            <id column="p_productId" property="productId" jdbcType="INTEGER"/>
+            <result column="p_userId" property="userId" jdbcType="VARCHAR"/>
+            <result column="p_productNo" property="productNo" jdbcType="VARCHAR"/>
+            <result column="p_productName" property="productName" jdbcType="VARCHAR"/>
+            <result column="p_productPhoto" property="productPhoto" jdbcType="VARCHAR"/>
+            <result column="p_productType" property="productType" jdbcType="VARCHAR"/>
+            <result column="p_productPrice" property="productPrice" jdbcType="DOUBLE"/>
+            <result column="p_productState" property="productState" jdbcType="BOOLEAN"/>
+            <result column="p_productInfo" property="productInfo" jdbcType="VARCHAR"/>
+            <result column="p_createTime" property="createTime" jdbcType="TIMESTAMP"/>
+            <result column="p_updateTime" property="updateTime" jdbcType="TIMESTAMP"/>
+
+            <!-- 商品关联用户：显式映射商品用户字段（SQL别名→实体字段） -->
+            <association property="user" javaType="com.example.springboard.pojo.User">
+                <id column="pu_userId" property="userId" jdbcType="INTEGER"/>
+                <result column="pu_userCode" property="userCode" jdbcType="VARCHAR"/>
+                <result column="pu_avatar" property="avatar" jdbcType="VARCHAR"/>
+                <result column="pu_userName" property="userName" jdbcType="VARCHAR"/>
+                <result column="pu_passWord" property="passWord" jdbcType="VARCHAR"/>
+                <result column="pu_onlineUsername" property="onlineUsername" jdbcType="VARCHAR"/>
+                <result column="pu_email" property="email" jdbcType="VARCHAR"/>
+                <result column="pu_telephoneNumber" property="telephoneNumber" jdbcType="VARCHAR"/>
+                <result column="pu_status" property="status" jdbcType="BOOLEAN"/>
+                <result column="pu_role" property="role" jdbcType="VARCHAR"/>
+                <result column="pu_balance" property="balance" jdbcType="DOUBLE"/>
+                <result column="pu_createTime" property="createTime" jdbcType="TIMESTAMP"/>
+                <result column="pu_updateTime" property="updateTime" jdbcType="TIMESTAMP"/>
+            </association>
+        </association>
+
+        <!-- 订单关联用户：显式映射订单用户字段（SQL别名→实体字段） -->
+        <association property="user" javaType="com.example.springboard.pojo.User">
+            <id column="u_userId" property="userId" jdbcType="INTEGER"/>
+            <result column="u_userCode" property="userCode" jdbcType="VARCHAR"/>
+            <result column="u_avatar" property="avatar" jdbcType="VARCHAR"/>
+            <result column="u_userName" property="userName" jdbcType="VARCHAR"/>
+            <result column="u_passWord" property="passWord" jdbcType="VARCHAR"/>
+            <result column="u_onlineUsername" property="onlineUsername" jdbcType="VARCHAR"/>
+            <result column="u_email" property="email" jdbcType="VARCHAR"/>
+            <result column="u_telephoneNumber" property="telephoneNumber" jdbcType="VARCHAR"/>
+            <result column="u_status" property="status" jdbcType="BOOLEAN"/>
+            <result column="u_role" property="role" jdbcType="VARCHAR"/>
+            <result column="u_balance" property="balance" jdbcType="DOUBLE"/>
+            <result column="u_createTime" property="createTime" jdbcType="TIMESTAMP"/>
+            <result column="u_updateTime" property="updateTime" jdbcType="TIMESTAMP"/>
+        </association>
+    </resultMap>
+
+    <!-- 查询所有订单（仅给同名字段加别名，字段名和数据库/实体一致） -->
+    <select id="AllOrder" resultMap="OrderWithProductResultMap">
+        SELECT
+            -- 订单字段：无别名（唯一，不会冲突）
+            o.orderId, o.orderNO, o.userId, o.productId,
+            o.paymentAmount, o.status, o.payStatus,
+            o.receiverName, o.receiverPhone, o.receiverAddress,
+            o.createTime, o.deletedAt,
+            -- 商品字段：加p_别名（区分同名字段）
+            p.productId AS p_productId,
+            p.userId AS p_userId,
+            p.productNo AS p_productNo,
+            p.productName AS p_productName,
+            p.productPhoto AS p_productPhoto,
+            p.productType AS p_productType,
+            p.productPrice AS p_productPrice,
+            p.productState AS p_productState,
+            p.productInfo AS p_productInfo,
+            p.createTime AS p_createTime,
+            p.updateTime AS p_updateTime,
+            -- 订单所属用户：加u_别名
+            u.userId AS u_userId,
+            u.userCode AS u_userCode,
+            u.avatar AS u_avatar,
+            u.userName AS u_userName,
+            u.passWord AS u_passWord,
+            u.onlineUsername AS u_onlineUsername,
+            u.email AS u_email,
+            u.telephoneNumber AS u_telephoneNumber,
+            u.status AS u_status,
+            u.role AS u_role,
+            u.balance AS u_balance,
+            u.createTime AS u_createTime,
+            u.updateTime AS u_updateTime,
+            -- 商品所属用户：加pu_别名
+            pu.userId AS pu_userId,
+            pu.userCode AS pu_userCode,
+            pu.avatar AS pu_avatar,
+            pu.userName AS pu_userName,
+            pu.passWord AS pu_passWord,
+            pu.onlineUsername AS pu_onlineUsername,
+            pu.email AS pu_email,
+            pu.telephoneNumber AS pu_telephoneNumber,
+            pu.status AS pu_status,
+            pu.role AS pu_role,
+            pu.balance AS pu_balance,
+            pu.createTime AS pu_createTime,
+            pu.updateTime AS pu_updateTime
+        FROM `order` o
+                 LEFT JOIN product p ON o.productId = p.productId
+                 LEFT JOIN user u ON o.userId = u.userId
+                 LEFT JOIN user pu ON p.userId = pu.userId
+    </select>
+
+    <!-- 分页查询订单（同步修改，仅加别名） -->
+    <select id="PageList" resultMap="OrderWithProductResultMap">
+        SELECT
+        o.orderId, o.orderNO, o.userId, o.productId,
+        o.paymentAmount, o.status, o.payStatus,
+        o.receiverName, o.receiverPhone, o.receiverAddress,
+        o.createTime, o.deletedAt,
+        p.productId AS p_productId,
+        p.userId AS p_userId,
+        p.productNo AS p_productNo,
+        p.productName AS p_productName,
+        p.productPhoto AS p_productPhoto,
+        p.productType AS p_productType,
+        p.productPrice AS p_productPrice,
+        p.productState AS p_productState,
+        p.productInfo AS p_productInfo,
+        p.createTime AS p_createTime,
+        p.updateTime AS p_updateTime,
+        u.userId AS u_userId,
+        u.userCode AS u_userCode,
+        u.avatar AS u_avatar,
+        u.userName AS u_userName,
+        u.passWord AS u_passWord,
+        u.onlineUsername AS u_onlineUsername,
+        u.email AS u_email,
+        u.telephoneNumber AS u_telephoneNumber,
+        u.status AS u_status,
+        u.role AS u_role,
+        u.balance AS u_balance,
+        u.createTime AS u_createTime,
+        u.updateTime AS u_updateTime,
+        pu.userId AS pu_userId,
+        pu.userCode AS pu_userCode,
+        pu.avatar AS pu_avatar,
+        pu.userName AS pu_userName,
+        pu.passWord AS pu_passWord,
+        pu.onlineUsername AS pu_onlineUsername,
+        pu.email AS pu_email,
+        pu.telephoneNumber AS pu_telephoneNumber,
+        pu.status AS pu_status,
+        pu.role AS pu_role,
+        pu.balance AS pu_balance,
+        pu.createTime AS pu_createTime,
+        pu.updateTime AS pu_updateTime
+        FROM `order` o
+        LEFT JOIN product p ON o.productId = p.productId
+        LEFT JOIN user u ON o.userId = u.userId
+        LEFT JOIN user pu ON p.userId = pu.userId
+        WHERE o.deletedAt = 1
+        <if test="productType != null and productType != ''">
+            AND p.productType = #{productType}
+        </if>
+        <if test="productName != null and productName != ''">
+            AND p.productName LIKE CONCAT('%', #{productName}, '%')
+        </if>
+    </select>
+</mapper>
