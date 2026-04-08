@@ -3,7 +3,7 @@ import { ElMessage,ElMessageBox  } from 'element-plus'
 
 
 // const baseURL="http://localhost:8080";
-const baseURL="/api";
+const baseURL="https://karry-production-846c.up.railway.app:8080";
 
 import {useTokenStore} from "@/store/token.js"
 
