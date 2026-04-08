@@ -5,7 +5,7 @@ server:
 
 spring:
   application:
-    name: rural-ecommerce
+    name: SecondHand
   
   datasource:
     url: jdbc:mysql://${MYSQLHOST}:${MYSQLPORT}/railway?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
